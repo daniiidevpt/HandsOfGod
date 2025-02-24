@@ -1348,7 +1348,7 @@ namespace HurricaneVR.Framework.Core.Grabbers
             angle *= Mathf.Deg2Rad;
             var angularVelocity = axis * (angle * (1.0f / Time.fixedDeltaTime));
 
-            RecentVelocities.Enqueue(Rigidbody.velocity);
+            RecentVelocities.Enqueue(Rigidbody.linearVelocity);
             RecentAngularVelocities.Enqueue(angularVelocity);
 
             if (PlayerController)
@@ -2638,11 +2638,11 @@ namespace HurricaneVR.Framework.Core.Grabbers
                 {
                     var throwVelocity = ComputeThrowVelocity(grabbable, out var angularVelocity);
                     if(!throwVelocity.IsInvalid())
-                        grabbable.Rigidbody.velocity = throwVelocity;
+                        grabbable.Rigidbody.linearVelocity = throwVelocity;
                     if(!throwVelocity.IsInvalid())
                         grabbable.Rigidbody.angularVelocity = angularVelocity;
                     //prevent clipping on throw
-                    if (timeout < .2f && grabbable.Rigidbody.velocity.magnitude > 2f) timeout = .2f;
+                    if (timeout < .2f && grabbable.Rigidbody.linearVelocity.magnitude > 2f) timeout = .2f;
                 }
 
                 if (!IgnoreNextCollisionCheck)
@@ -2970,7 +2970,7 @@ namespace HurricaneVR.Framework.Core.Grabbers
                 return false;
             }
 
-            grabbable.Rigidbody.velocity = Vector3.zero;
+            grabbable.Rigidbody.linearVelocity = Vector3.zero;
             grabbable.Rigidbody.angularVelocity = Vector3.zero;
 
             if (grabPoint) GrabPoint = grabPoint.transform;
@@ -3128,7 +3128,7 @@ namespace HurricaneVR.Framework.Core.Grabbers
                         GrabbedTarget.transform.rotation = HandModel.rotation * startRot * Quaternion.AngleAxis(angle * elapsed / time, axis.GetVector());
                         GrabbedTarget.transform.position = HandModel.transform.TransformPoint(Vector3.Lerp(startPos, targetPos, elapsed / time));
                         if (GrabbedTarget.Rigidbody)
-                            GrabbedTarget.Rigidbody.velocity = GrabbedTarget.Rigidbody.angularVelocity = Vector3.zero;
+                            GrabbedTarget.Rigidbody.linearVelocity = GrabbedTarget.Rigidbody.angularVelocity = Vector3.zero;
                         elapsed += Time.deltaTime;
                         yield return null;
                     }

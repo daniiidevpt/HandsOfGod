@@ -103,7 +103,7 @@ namespace HurricaneVR.TechDemo.Scripts
                     state.Grabbable.transform.position = state.Position;
                     state.Grabbable.transform.rotation = state.Rotation;
                     state.Grabbable.transform.localScale = state.Scale;
-                    state.Grabbable.Rigidbody.velocity = Vector3.zero;
+                    state.Grabbable.Rigidbody.linearVelocity = Vector3.zero;
                     state.Grabbable.Rigidbody.angularVelocity = Vector3.zero;
                 }
 
