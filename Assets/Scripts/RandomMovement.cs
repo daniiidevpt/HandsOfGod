@@ -13,7 +13,7 @@ public class RandomMovement : MonoBehaviour
 
     private Rigidbody m_Rigidbody;
     private HVRGrabbable m_Grabbable;
-    private MeshRenderer m_Renderer;
+    private MeshRenderer[] m_Renderers;
     private Material[] m_Materials;
     private Vector3 m_TargetPos;
     private bool m_IsGrounded = true;
@@ -22,8 +22,12 @@ public class RandomMovement : MonoBehaviour
     {
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Grabbable = GetComponent<HVRGrabbable>();
-        m_Renderer = GetComponentInChildren<MeshRenderer>();
-        m_Materials = m_Renderer.materials;
+        m_Renderers = GetComponentsInChildren<MeshRenderer>();
+
+        for (int i = 0; i < m_Renderers.Length; i++)
+        {
+            m_Materials = m_Renderers[i].materials;
+        }
 
         SetNewTarget();
     }
@@ -81,12 +85,19 @@ public class RandomMovement : MonoBehaviour
         Material[] newMaterials = new Material[m_Materials.Length + 1];
         m_Materials.CopyTo(newMaterials, 0);
         newMaterials[newMaterials.Length - 1] = m_Outline;
-        m_Renderer.materials = newMaterials;
+
+        for (int i = 0; i < m_Renderers.Length; i++)
+        {
+            m_Renderers[i].materials = newMaterials;
+        }
     }
 
     private void DisableOutline(HVRGrabberBase grabberBase, HVRGrabbable grabbable)
     {
-        m_Renderer.materials = m_Materials;
+        for (int i = 0; i < m_Renderers.Length; i++)
+        {
+            m_Renderers[i].materials = m_Materials;
+        }
     }
 
     private void SetNewTarget()
