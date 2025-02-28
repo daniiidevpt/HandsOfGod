@@ -9,12 +9,9 @@ public class RandomMovement : MonoBehaviour
     [SerializeField] private float m_Speed = 3f;
     [SerializeField] private float m_JumpForce = 5f;
     [SerializeField] private float m_JumpChance = 0.2f;
-    [SerializeField] private Material m_Outline;
 
     private Rigidbody m_Rigidbody;
     private HVRGrabbable m_Grabbable;
-    private MeshRenderer[] m_Renderers;
-    private Material[] m_Materials;
     private Vector3 m_TargetPos;
     private bool m_IsGrounded = true;
 
@@ -22,12 +19,6 @@ public class RandomMovement : MonoBehaviour
     {
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Grabbable = GetComponent<HVRGrabbable>();
-        m_Renderers = GetComponentsInChildren<MeshRenderer>();
-
-        for (int i = 0; i < m_Renderers.Length; i++)
-        {
-            m_Materials = m_Renderers[i].materials;
-        }
 
         SetNewTarget();
     }
@@ -36,18 +27,12 @@ public class RandomMovement : MonoBehaviour
     {
         m_Grabbable.HandGrabbed.AddListener(UnlockRotation);
         m_Grabbable.HandReleased.AddListener(LockRotation);
-
-        m_Grabbable.HoverEnter.AddListener(EnableOutline);
-        m_Grabbable.HoverExit.AddListener(DisableOutline);
     }
 
     private void OnDisable()
     {
         m_Grabbable.HandGrabbed.RemoveListener(UnlockRotation);
         m_Grabbable.HandReleased.RemoveListener(LockRotation);
-
-        m_Grabbable.HoverEnter.RemoveListener(EnableOutline);
-        m_Grabbable.HoverExit.RemoveListener(DisableOutline);
     }
 
     private void FixedUpdate()
@@ -78,26 +63,6 @@ public class RandomMovement : MonoBehaviour
     {
         RigidbodyConstraints unfreeze = RigidbodyConstraints.None;
         m_Rigidbody.constraints = unfreeze;
-    }
-
-    private void EnableOutline(HVRGrabberBase grabberBase, HVRGrabbable grabbable)
-    {
-        Material[] newMaterials = new Material[m_Materials.Length + 1];
-        m_Materials.CopyTo(newMaterials, 0);
-        newMaterials[newMaterials.Length - 1] = m_Outline;
-
-        for (int i = 0; i < m_Renderers.Length; i++)
-        {
-            m_Renderers[i].materials = newMaterials;
-        }
-    }
-
-    private void DisableOutline(HVRGrabberBase grabberBase, HVRGrabbable grabbable)
-    {
-        for (int i = 0; i < m_Renderers.Length; i++)
-        {
-            m_Renderers[i].materials = m_Materials;
-        }
     }
 
     private void SetNewTarget()
