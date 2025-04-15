@@ -122,14 +122,14 @@ namespace HOG.Villager
                 return;
             }
 
-            List<Vector3> cleanPath = CleanPathStart(path, startPosRounded);
+            //List<Vector3> cleanPath = CleanPathStart(path, startPosRounded);
 
-            m_CurrentPath = new Queue<Vector3>(cleanPath);
+            m_CurrentPath = new Queue<Vector3>(path);
             m_CurrentTarget = null;
             m_IsMoving = true;
             m_RepathTimer = 0f;
 
-            GridManager.Instance.DebugVisualizer.SetPath(m_Brain.GetInstanceID().ToString() ,cleanPath);
+            GridManager.Instance.DebugVisualizer.SetPath(m_Brain.GetInstanceID().ToString() , path);
         }
         
         public void StopMovement()

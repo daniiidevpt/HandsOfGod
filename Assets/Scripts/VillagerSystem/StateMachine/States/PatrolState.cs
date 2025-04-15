@@ -63,13 +63,21 @@ namespace HOG.Villager
             if (m_Waypoints == null || m_Waypoints.Count == 0)
                 yield break;
 
+            int nextIndex;
+            do
+            {
+                nextIndex = Random.Range(0, m_Waypoints.Count);
+            } while (nextIndex == m_LastWaypointIndex && m_Waypoints.Count > 1);
+
+            m_CurrentWaypointIndex = nextIndex;
+            m_LastWaypointIndex = m_CurrentWaypointIndex;
+
             Vector3 nextWaypoint = m_Waypoints[m_CurrentWaypointIndex];
             GridNode node = GridManager.Instance.GetNodeFromWorld(nextWaypoint);
 
             if (node == null || !node.m_Walkable || node.m_IsPathBlocked)
             {
                 Debug.LogWarning($"Waypoint at index {m_CurrentWaypointIndex} is not walkable. Skipping.");
-                m_CurrentWaypointIndex = (m_CurrentWaypointIndex + 1) % m_Waypoints.Count;
                 MoveToNextWaypoint();
                 yield break;
             }
@@ -79,8 +87,6 @@ namespace HOG.Villager
 
         private void OnDestinationReached()
         {
-            m_CurrentWaypointIndex = (m_CurrentWaypointIndex + 1) % m_Waypoints.Count;
-            m_LastWaypointIndex = m_CurrentWaypointIndex;
             MoveToNextWaypoint();
         }
     }
