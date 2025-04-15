@@ -12,7 +12,7 @@ namespace HOG.Villager
 
         readonly List<Transform> m_DetectedObjects = new List<Transform>();
 
-        private void Start()
+        public void Initialize()
         {
             m_Brain = GetComponentInParent<VillagerBrain>();
 
@@ -26,24 +26,6 @@ namespace HOG.Villager
             foreach (var c in colliders)
             {
                 ProcessTrigger(c, transform => m_DetectedObjects.Add(transform));
-            }
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (!Application.isPlaying) return;
-
-            float worldRadius = m_Brain.SensorRadius * transform.lossyScale.x;
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(transform.position, worldRadius);
-
-            Gizmos.color = Color.red;
-            foreach (Transform obj in m_DetectedObjects)
-            {
-                if (obj != null)
-                {
-                    Gizmos.DrawSphere(obj.position, 0.2f);
-                }
             }
         }
 
@@ -116,5 +98,25 @@ namespace HOG.Villager
 
             return closestTarget;
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (!Application.isPlaying) return;
+
+            float worldRadius = m_Brain.SensorRadius * transform.lossyScale.x;
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position, worldRadius);
+
+            Gizmos.color = Color.yellow;
+            foreach (Transform obj in m_DetectedObjects)
+            {
+                if (obj != null)
+                {
+                    Gizmos.DrawWireSphere(obj.position, 0.2f);
+                }
+            }
+        }
+#endif
     }
 }

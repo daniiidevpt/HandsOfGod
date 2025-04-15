@@ -16,7 +16,7 @@ namespace HOG.Resources
             GameObject VFXInst = Instantiate(m_CollectVFX, transform.position + new Vector3(0, 0.3f, 0), Quaternion.identity);
             Destroy(VFXInst, 1f);
 
-            Destroy(gameObject);
+            Destroy(this.gameObject);
 
             return info;
         }

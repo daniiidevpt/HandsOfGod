@@ -1,6 +1,9 @@
 using HOG.Resources;
+using HOG.Villager;
 using System.Collections;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace HOG.Building
 {
@@ -11,10 +14,18 @@ namespace HOG.Building
         [SerializeField] private float m_StageDurationMinutes = 1f;
         [SerializeField] private GameObject[] m_StageObjects;
         private int m_CurrentStageIndex = 0;
+        private bool m_IsFinished = false;
 
         [Header("Building Cost")]
         [SerializeField] private int m_WoodAmount = 5;
         [SerializeField] private int m_RockAmount = 5;
+
+        [Header("UI Settings")]
+        [SerializeField] private Button m_BuildButton;
+        [SerializeField] private TextMeshProUGUI m_WoodCostText;
+        [SerializeField] private TextMeshProUGUI m_RockCostText;
+
+        private VillagerBrain m_VillagerInBuilding;
 
         private void Start()
         {
@@ -23,7 +34,29 @@ namespace HOG.Building
                 m_StageObjects[i].SetActive(i == 0);
             }
 
-            StartCoroutine(BuildHouse());
+            m_WoodCostText.text = $"Wood: {m_WoodAmount}";
+            m_RockCostText.text = $"Wood: {m_RockAmount}";
+
+            Invoke("StartBuildingHouse", 5f);
+        }
+
+        private void OnEnable()
+        {
+            m_BuildButton.onClick.AddListener(StartBuildingHouse);
+        }
+
+        private void OnDisable()
+        {
+            m_BuildButton.onClick.RemoveListener(StartBuildingHouse);
+        }
+
+        private void Update()
+        {
+            if (!m_IsFinished && m_CurrentStage == BuildingStage.Stage4)
+            {
+                VillagersManager.Instance.UnassignVillagerFromBuilding(m_VillagerInBuilding);
+                m_IsFinished = true;
+            }
         }
 
         public void StartBuildingHouse()
@@ -31,6 +64,7 @@ namespace HOG.Building
             if (ResourceManager.Instance.GetResourceAmount(ResourceType.Wood) >= m_WoodAmount && ResourceManager.Instance.GetResourceAmount(ResourceType.Rock) >= m_RockAmount)
             {
                 StartCoroutine(BuildHouse());
+                m_VillagerInBuilding = VillagersManager.Instance.AssignVillagerToBuilding(this.transform.position);
             }
             else
             {
