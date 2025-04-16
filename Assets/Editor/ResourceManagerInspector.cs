@@ -13,8 +13,12 @@ public class ResourceManagerInspector : Editor
         ResourceManager resourceManager = (ResourceManager)target;
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Behavior Tree Debug", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Resource Manager Debug", EditorStyles.boldLabel);
 
+        EditorGUILayout.LabelField($"Wood: {resourceManager.GetResourceAmount(ResourceType.Wood)}");
+        EditorGUILayout.LabelField($"Rock: {resourceManager.GetResourceAmount(ResourceType.Rock)}");
+
+        EditorGUILayout.Space();
         if (GUILayout.Button("Add Wood"))
         {
             resourceManager.AddResource(new ResourceCollectionInfo(ResourceType.Wood, 1));

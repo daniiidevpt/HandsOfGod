@@ -12,6 +12,7 @@ namespace HOG.Building
         [Header("Building Settings")]
         [SerializeField] private BuildingStage m_CurrentStage = BuildingStage.Stage1;
         [SerializeField] private float m_StageDurationMinutes = 1f;
+        [SerializeField] private Transform m_BuildingPosition = null;
         [SerializeField] private GameObject[] m_StageObjects;
         private int m_CurrentStageIndex = 0;
         private bool m_IsFinished = false;
@@ -21,6 +22,7 @@ namespace HOG.Building
         [SerializeField] private int m_RockAmount = 5;
 
         [Header("UI Settings")]
+        [SerializeField] private GameObject m_Canvas;
         [SerializeField] private Button m_BuildButton;
         [SerializeField] private TextMeshProUGUI m_WoodCostText;
         [SerializeField] private TextMeshProUGUI m_RockCostText;
@@ -63,8 +65,9 @@ namespace HOG.Building
         {
             if (ResourceManager.Instance.GetResourceAmount(ResourceType.Wood) >= m_WoodAmount && ResourceManager.Instance.GetResourceAmount(ResourceType.Rock) >= m_RockAmount)
             {
+                m_Canvas.SetActive(false);
                 StartCoroutine(BuildHouse());
-                m_VillagerInBuilding = VillagersManager.Instance.AssignVillagerToBuilding(this.transform.position);
+                m_VillagerInBuilding = VillagersManager.Instance.AssignVillagerToBuilding(m_BuildingPosition.transform.position);
             }
             else
             {

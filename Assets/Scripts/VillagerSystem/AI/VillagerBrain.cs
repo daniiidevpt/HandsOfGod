@@ -22,8 +22,14 @@ namespace HOG.Villager
         private HVRGrabbable m_Grabbable;
 
         private StateMachine m_StateMachine;
-        public IdleState IdleState;
-        public PatrolState PatrolState;
+        private UtilitySelector m_UtilitySelector;
+
+        #region States
+        public IdleState IdleState { get; private set; }
+        public PatrolState PatrolState { get; private set; }
+        public  CollectWoodState CollectWoodState { get; private set; }
+        public CollectRockState CollectRockState { get; private set; }
+        #endregion
 
         private VillagerSensor m_Sensor;
         private VillagerLocomotion m_Locomotion;
@@ -48,14 +54,19 @@ namespace HOG.Villager
         {
             IdleState = new IdleState(this);
             PatrolState = new PatrolState(this);
+            CollectWoodState = new CollectWoodState(this);
+            CollectRockState = new CollectRockState(this);
+
+            m_UtilitySelector = new UtilitySelector();
+            m_UtilitySelector.RegisterState(CollectWoodState);
+            m_UtilitySelector.RegisterState(CollectRockState);
 
             m_StateMachine = new StateMachine();
-
             m_StateMachine.ChangeState(PatrolState);
 
             m_StateMachine.RegisterEventTransition("Grabbed", IdleState);
-            m_StateMachine.RegisterEventTransition("Released", PatrolState);
-            m_StateMachine.RegisterEventTransition("LowOnWood", new CollectState(this, null, Resources.ResourceType.Wood));
+            //m_StateMachine.RegisterEventTransition("Released", PatrolState);
+            m_StateMachine.RegisterEventTransition("LowOnWood", CollectWoodState);
 
             //m_Locomotion.SetDestination(GridManager.Instance.GetNodeFromWorld(new Vector3(8, 0, 8)));
             //m_Locomotion.OnDestinationReached += () =>
@@ -95,6 +106,7 @@ namespace HOG.Villager
         public void OnGrabbed(HVRGrabberBase grabberBase, HVRGrabbable grabbable)
         {
             m_Locomotion.PauseMovement();
+            m_StateMachine.TriggerEvent("Grabbed");
 
             RigidbodyConstraints unfreeze = RigidbodyConstraints.None;
             m_Rigidbody.constraints = unfreeze;
@@ -107,6 +119,18 @@ namespace HOG.Villager
             RigidbodyConstraints freezeX = RigidbodyConstraints.FreezeRotationX;
             RigidbodyConstraints freezeZ = RigidbodyConstraints.FreezeRotationZ;
             m_Rigidbody.constraints = freezeX | freezeZ;
+
+            Vector3 dropPosition = new Vector3(transform.position.x, 0f, transform.position.z);
+            var bestState = m_UtilitySelector.GetBestState(dropPosition);
+
+            if (bestState != null)
+            {
+                m_StateMachine.ChangeState(bestState);
+            }
+            else
+            {
+                m_StateMachine.ChangeState(PatrolState);
+            }
         }
 
         public void OnHoverEnter(HVRGrabberBase grabberBase, HVRGrabbable grabbable)
