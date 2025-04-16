@@ -29,6 +29,7 @@ namespace HOG.Villager
         public PatrolState PatrolState { get; private set; }
         public  CollectWoodState CollectWoodState { get; private set; }
         public CollectRockState CollectRockState { get; private set; }
+        public PanicState PanicState { get; private set; }
         #endregion
 
         private VillagerSensor m_Sensor;
@@ -56,6 +57,7 @@ namespace HOG.Villager
             PatrolState = new PatrolState(this);
             CollectWoodState = new CollectWoodState(this);
             CollectRockState = new CollectRockState(this);
+            PanicState = new PanicState(this);
 
             m_UtilitySelector = new UtilitySelector();
             m_UtilitySelector.RegisterState(CollectWoodState);
@@ -67,6 +69,8 @@ namespace HOG.Villager
             m_StateMachine.RegisterEventTransition("Grabbed", IdleState);
             //m_StateMachine.RegisterEventTransition("Released", PatrolState);
             m_StateMachine.RegisterEventTransition("LowOnWood", CollectWoodState);
+            m_StateMachine.RegisterEventTransition("LowOnRock", CollectRockState);
+            m_StateMachine.RegisterEventTransition("Panic", PanicState);
 
             //m_Locomotion.SetDestination(GridManager.Instance.GetNodeFromWorld(new Vector3(8, 0, 8)));
             //m_Locomotion.OnDestinationReached += () =>
@@ -82,6 +86,16 @@ namespace HOG.Villager
             if (Input.GetKeyDown(KeyCode.W))
             {
                 m_StateMachine.TriggerEvent("LowOnWood");
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                m_StateMachine.TriggerEvent("LowOnRock");
+            }
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                m_StateMachine.TriggerEvent("Panic");
             }
         }
 

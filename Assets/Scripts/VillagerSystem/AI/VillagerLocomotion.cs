@@ -140,6 +140,16 @@ namespace HOG.Villager
             m_Rigidbody.linearVelocity = Vector3.zero;
         }
 
+        public void StartSprint()
+        {
+            m_MoveSpeed = 1f;
+        }
+
+        public void StopSprint()
+        {
+            m_MoveSpeed = 0.5f;
+        }
+
         public void PauseMovement()
         {
             m_IsMoving = false;
