@@ -39,7 +39,7 @@ namespace HOG.Building
             m_WoodCostText.text = $"Wood: {m_WoodAmount}";
             m_RockCostText.text = $"Wood: {m_RockAmount}";
 
-            //Invoke("StartBuildingHouse", 5f);
+            Invoke("StartBuildingHouse", 5f);
         }
 
         private void OnEnable()

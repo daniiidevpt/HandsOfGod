@@ -1,8 +1,11 @@
 ﻿using HOG.Grid;
 using HurricaneVR.Framework.Core;
 using HurricaneVR.Framework.Core.Grabbers;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.Playables;
 
 namespace HOG.Villager
 {
@@ -17,6 +20,17 @@ namespace HOG.Villager
         [SerializeField] private float m_SensorRadius = 10f;
         public List<string> Tags => m_Tags;
         public float SensorRadius => m_SensorRadius;
+
+        [Header("Tools Settings")]
+        [SerializeField] private AnimationClip m_VillagerSwingAnim;
+        [SerializeField] private GameObject m_Hammer;
+        [SerializeField] private GameObject m_Shovel;
+        [SerializeField] private GameObject m_Sword;
+
+        public AnimationClip VillagerSwingAnim => m_VillagerSwingAnim;
+        public GameObject Hammer => m_Hammer;
+        public GameObject Shovel => m_Shovel;
+        public GameObject Sword => m_Sword;
 
         private Rigidbody m_Rigidbody;
         private HVRGrabbable m_Grabbable;
@@ -161,6 +175,36 @@ namespace HOG.Villager
             {
                 m_Locomotion.ResumeMovement();
             }
+        }
+
+        public IEnumerator PlayVillagerSwing(GameObject toolObject, AnimationClip clip, float duration)
+        {
+            toolObject.SetActive(true);
+
+            var animator = toolObject.GetComponent<Animator>();
+            if (animator == null)
+            {
+                Debug.LogError($"Tool '{toolObject.name}' does not have an Animator component.");
+                yield break;
+            }
+
+            var graph = PlayableGraph.Create();
+            var output = AnimationPlayableOutput.Create(graph, "ToolSwing", animator);
+            var clipPlayable = AnimationClipPlayable.Create(graph, clip);
+
+            clipPlayable.SetDuration(duration);
+            clipPlayable.SetTime(0);
+            clipPlayable.SetSpeed(1);
+
+            output.SetSourcePlayable(clipPlayable);
+            graph.Play();
+
+            yield return new WaitForSeconds(duration);
+
+            graph.Stop();
+            graph.Destroy();
+
+            toolObject.SetActive(false);
         }
     }
 }

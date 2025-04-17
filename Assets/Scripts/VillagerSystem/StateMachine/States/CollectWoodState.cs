@@ -7,6 +7,9 @@ namespace HOG.Villager
     {
         private Resource m_Resource;
 
+        private Coroutine m_SwingRoutine;
+        private Coroutine m_CollectRoutine;
+
         public CollectWoodState(VillagerBrain villagerBrain, string stateName = null) : base(villagerBrain, stateName) { }
 
         public float GetScore(Vector3 villagerPosition)
@@ -48,20 +51,37 @@ namespace HOG.Villager
         public override void Update()
         {
             base.Update();
+
+            if (m_Resource.IsCollected)
+            {
+                m_Brain.GetStateMachine().ChangeState(m_Brain.PatrolState);
+                return;
+            }
         }
 
         public override void Exit()
         {
             base.Exit();
 
+            if (m_SwingRoutine != null)
+            {
+                m_Brain.StopCoroutine(m_SwingRoutine);
+                m_SwingRoutine = null;
+            }
+
+            if (m_CollectRoutine != null)
+            {
+                m_Brain.StopCoroutine(m_CollectRoutine);
+                m_CollectRoutine = null;
+            }
+
             m_Brain.GetLocomotion().OnDestinationReached -= OnDestinationReached;
         }
 
         private void OnDestinationReached()
         {
-            m_Resource.Collect();
-
-            m_Brain.GetStateMachine().ChangeState(m_Brain.PatrolState);
+            m_SwingRoutine = m_Brain.StartCoroutine(m_Brain.PlayVillagerSwing(m_Brain.Hammer, m_Brain.VillagerSwingAnim, m_Resource.TimeToCollect));
+            m_CollectRoutine = m_Brain.StartCoroutine(m_Resource.StartCollection());
         }
     }
 }

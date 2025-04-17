@@ -45,6 +45,7 @@ namespace HOG.Villager
             if (m_ChooseWayointRoutine != null)
             {
                 m_Brain.StopCoroutine(m_ChooseWayointRoutine);
+                m_ChooseWayointRoutine = null;
             }
 
             m_Brain.GetLocomotion().StopMovement();

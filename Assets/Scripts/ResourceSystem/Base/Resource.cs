@@ -1,8 +1,9 @@
+using System.Collections;
 using UnityEngine;
 
 namespace HOG.Resources
 {
-    public abstract class Resource : MonoBehaviour, ICollectable
+    public abstract class Resource : MonoBehaviour
     {
         [Header("Resource Settings")]
         [SerializeField] protected ResourceType m_ResourceType;
@@ -10,9 +11,17 @@ namespace HOG.Resources
         protected bool m_IsCollected = false;
 
         [Header("Durability Settings")]
-        [SerializeField] private int m_HitsToDestroy = 3;
+        [SerializeField] protected int m_TimeToCollect = 3;
 
         public bool IsCollected => m_IsCollected;
+        public int TimeToCollect => m_TimeToCollect;
+
+        public virtual IEnumerator StartCollection()
+        {
+            yield return new WaitForSeconds(m_TimeToCollect);
+
+            Collect();
+        }
 
         public virtual ResourceCollectionInfo Collect()
         {
@@ -32,15 +41,5 @@ namespace HOG.Resources
         }
 
         public ResourceType GetResourceType() => m_ResourceType;
-
-        public void TakeHit(int hitAmount)
-        {
-            m_HitsToDestroy--;
-
-            if (m_HitsToDestroy <= 0)
-            {
-                Collect();
-            }
-        }
     }
 }
