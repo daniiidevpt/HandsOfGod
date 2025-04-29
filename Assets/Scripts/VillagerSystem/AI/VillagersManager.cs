@@ -16,24 +16,25 @@ namespace HOG.Villager
             m_Villagers = FindObjectsByType<VillagerBrain>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).ToList();
         }
 
-        public VillagerBrain AssignVillagerToBuilding(Vector3 housePosition)
+        public VillagerBrain FindClosestAvailableVillager(Vector3 position, VillagerBrain requester)
         {
-            int rnd = Random.Range(0, m_Villagers.Count);
+            VillagerBrain closest = null;
+            float minDist = float.MaxValue;
 
-            VillagerBrain villager = m_Villagers[rnd];
-            villager.GetStateMachine().ChangeState(new BuildingState(villager, null, housePosition));
-
-            return villager;
-        }
-
-        public void UnassignVillagerFromBuilding(VillagerBrain villager)
-        {
-            if (villager.GetStateMachine().CurrentState is not BuildingState)
+            foreach (var villager in m_Villagers)
             {
-                Debug.LogError($"{villager.name} was not building when it was supposed to be");
+                if (villager == requester || villager.IsBusy || villager.GetStateMachine().CurrentState is TalkState)
+                    continue;
+
+                float dist = Vector3.Distance(position, villager.transform.position);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    closest = villager;
+                }
             }
 
-            villager.GetStateMachine().ChangeState(villager.PatrolState);
+            return closest;
         }
     }
 }

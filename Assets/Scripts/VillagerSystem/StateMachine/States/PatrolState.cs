@@ -9,11 +9,13 @@ namespace HOG.Villager
     {
         private List<Vector3> m_Waypoints = new List<Vector3>();
         private int m_CurrentWaypointIndex = 0;
-        private int m_LastWaypointIndex = 0;
 
-        private Coroutine m_ChooseWayointRoutine;
+        private Coroutine m_ChooseWaypointRoutine;
 
-        public PatrolState(VillagerBrain villagerBrain, string stateName = null) : base(villagerBrain, stateName) 
+        private Queue<int> m_RecentWaypoints = new Queue<int>();
+        private const int m_RecentWaypointLimit = 5;
+
+        public PatrolState(VillagerBrain villagerBrain, string stateName = null) : base(villagerBrain, stateName)
         {
             for (int i = 0; i < villagerBrain.Waypoints.Count; i++)
             {
@@ -26,26 +28,19 @@ namespace HOG.Villager
         {
             base.Enter();
 
-            m_CurrentWaypointIndex = 0;
-
-            if (m_LastWaypointIndex <= m_Waypoints.Count)
-            {
-                m_LastWaypointIndex = 0;
-            }
+            MoveToNextWaypoint();
 
             m_Brain.GetLocomotion().OnDestinationReached += OnDestinationReached;
-
-            MoveToNextWaypoint();
         }
 
         public override void Exit()
         {
             base.Exit();
 
-            if (m_ChooseWayointRoutine != null)
+            if (m_ChooseWaypointRoutine != null)
             {
-                m_Brain.StopCoroutine(m_ChooseWayointRoutine);
-                m_ChooseWayointRoutine = null;
+                m_Brain.StopCoroutine(m_ChooseWaypointRoutine);
+                m_ChooseWaypointRoutine = null;
             }
 
             m_Brain.GetLocomotion().StopMovement();
@@ -54,24 +49,32 @@ namespace HOG.Villager
 
         private void MoveToNextWaypoint()
         {
-            m_ChooseWayointRoutine = m_Brain.StartCoroutine(MoveToNextWaypointWithDelay());
+            m_ChooseWaypointRoutine = m_Brain.StartCoroutine(MoveToNextWaypointWithDelay());
         }
 
         private IEnumerator MoveToNextWaypointWithDelay()
         {
-            yield return new WaitForSeconds(1);
-
             if (m_Waypoints == null || m_Waypoints.Count == 0)
                 yield break;
 
             int nextIndex;
+            int attempts = 0;
+            const int maxAttempts = 10;
+
             do
             {
                 nextIndex = Random.Range(0, m_Waypoints.Count);
-            } while (nextIndex == m_LastWaypointIndex && m_Waypoints.Count > 1);
+                attempts++;
+            }
+            while (m_RecentWaypoints.Contains(nextIndex) && attempts < maxAttempts);
 
             m_CurrentWaypointIndex = nextIndex;
-            m_LastWaypointIndex = m_CurrentWaypointIndex;
+
+            if (m_RecentWaypoints.Count >= m_RecentWaypointLimit)
+            {
+                m_RecentWaypoints.Dequeue();
+            }
+            m_RecentWaypoints.Enqueue(m_CurrentWaypointIndex);
 
             Vector3 nextWaypoint = m_Waypoints[m_CurrentWaypointIndex];
             GridNode node = GridManager.Instance.GetNodeFromWorld(nextWaypoint);

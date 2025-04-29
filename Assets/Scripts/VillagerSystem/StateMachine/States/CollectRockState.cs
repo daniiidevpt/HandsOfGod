@@ -3,59 +3,45 @@ using UnityEngine;
 
 namespace HOG.Villager
 {
-    public class CollectRockState : BaseState, IUtilityState
+    public class CollectRockState : BaseState
     {
-        private Resource m_Resource;
-
         private Coroutine m_SwingRoutine;
         private Coroutine m_CollectRoutine;
 
         public CollectRockState(VillagerBrain villagerBrain, string stateName = null) : base(villagerBrain, stateName) { }
 
-        public float GetScore(Vector3 villagerPosition)
+        public void SetContext(StateContext context)
         {
-            var rock = m_Brain.GetSensor().GetClosestTarget("Resource_Rock");
-            if (rock == null) return 0f;
-
-            float distance = Vector3.Distance(villagerPosition, rock.position);
-            m_Resource = rock.GetComponent<Rock>();
-
-            return 1f / Mathf.Max(distance, 0.1f);
+            m_Context = context;
         }
 
         public override void Enter()
         {
             base.Enter();
 
-            if (m_Resource == null)
-            {
-                var rock = m_Brain.GetSensor().GetClosestTarget("Resource_Rock");
-                if ( rock != null)
-                {
-                    m_Resource = rock.GetComponent<Rock>();
-                }
-            }
+            m_Brain.IsBusy = true;
 
-            if (m_Resource == null)
+            if (m_Context == null || m_Context.Target == null || m_Context.TargetResource == null)
             {
-                Debug.LogWarning("Rock was null");
+                Debug.LogWarning("Context or TargetResource is null. Returning to Patrol.");
                 m_Brain.GetStateMachine().ChangeState(m_Brain.PatrolState);
                 return;
             }
 
+            var destination = m_Context.Target.position;
+
             m_Brain.GetLocomotion().StopMovement();
+            m_Brain.GetLocomotion().SetDestination(destination);
             m_Brain.GetLocomotion().OnDestinationReached += OnDestinationReached;
-            m_Brain.GetLocomotion().SetDestination(m_Resource.transform.position);
         }
 
         public override void Update()
         {
             base.Update();
 
-            if (m_Resource.IsCollected)
+            if (m_Context.TargetResource.IsCollected)
             {
                 m_Brain.GetStateMachine().ChangeState(m_Brain.PatrolState);
-                return;
             }
         }
 
@@ -63,9 +49,13 @@ namespace HOG.Villager
         {
             base.Exit();
 
+            m_Brain.IsBusy = false;
+            m_Context = null;
+
             if (m_SwingRoutine != null)
             {
                 m_Brain.StopCoroutine(m_SwingRoutine);
+                m_Brain.DisableTools();
                 m_SwingRoutine = null;
             }
 
@@ -80,8 +70,15 @@ namespace HOG.Villager
 
         private void OnDestinationReached()
         {
-            m_SwingRoutine = m_Brain.StartCoroutine(m_Brain.PlayVillagerSwing(m_Brain.Shovel, m_Brain.VillagerSwingAnim, m_Resource.TimeToCollect));
-            m_CollectRoutine = m_Brain.StartCoroutine(m_Resource.StartCollection());
+            if (m_Context.TargetResource == null)
+            {
+                Debug.LogWarning("Resource missing on arrival.");
+                m_Brain.GetStateMachine().ChangeState(m_Brain.PatrolState);
+                return;
+            }
+
+            m_SwingRoutine = m_Brain.StartCoroutine(m_Brain.PlayShovelSwing(m_Context.TargetResource.TimeToCollect));
+            m_CollectRoutine = m_Brain.StartCoroutine(m_Context.TargetResource.StartCollection());
         }
     }
 }

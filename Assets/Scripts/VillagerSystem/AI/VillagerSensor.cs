@@ -77,7 +77,7 @@ namespace HOG.Villager
 
             Transform closestTarget = null;
             float closestDistanceSqr = Mathf.Infinity;
-            Vector3 currentPosition = transform.position;
+            Vector3 currentPosition = new Vector3(transform.position.x, 0f, transform.position.z);
 
             m_DetectedObjects.RemoveAll(obj => obj == null || !obj.CompareTag(tag));
 
@@ -98,6 +98,36 @@ namespace HOG.Villager
 
             return closestTarget;
         }
+
+        public Transform GetClosestTarget(List<string> tags)
+        {
+            if (m_DetectedObjects.Count == 0 || tags == null || tags.Count == 0)
+                return null;
+
+            Transform closestTarget = null;
+            float closestDistanceSqr = Mathf.Infinity;
+            Vector3 currentPosition = new Vector3(transform.position.x, 0f, transform.position.z);
+
+            m_DetectedObjects.RemoveAll(obj => obj == null || !tags.Contains(obj.tag));
+
+            foreach (Transform potentialTarget in m_DetectedObjects)
+            {
+                if (tags.Contains(potentialTarget.tag))
+                {
+                    Vector3 directionToTarget = potentialTarget.position - currentPosition;
+                    float dSqrToTarget = directionToTarget.sqrMagnitude;
+
+                    if (dSqrToTarget < closestDistanceSqr)
+                    {
+                        closestDistanceSqr = dSqrToTarget;
+                        closestTarget = potentialTarget;
+                    }
+                }
+            }
+
+            return closestTarget;
+        }
+
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()

@@ -6,6 +6,9 @@ namespace HOG.Villager
     {
         protected string m_StateName;
         protected VillagerBrain m_Brain;
+        protected StateContext m_Context;
+
+        public string StateName => m_StateName;
 
         public BaseState(VillagerBrain villagerBrain, string stateName = null)
         {

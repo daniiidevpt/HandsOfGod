@@ -7,16 +7,6 @@ namespace HOG.Villager
 {
     public class VillagerLocomotion : MonoBehaviour
     {
-        [Header("Movement Settings")]
-        public float m_MoveSpeed = 3f;
-        public float m_StopDistance = 0.1f;
-        public float m_RotationSpeed = 5f;
-        public bool m_UsePhysicsMovement = true;
-
-        [Header("Pathfinding Behavior")]
-        public bool m_UseDynamicRepathing = false;
-        public float m_RepathRate = 1f;
-
         private bool m_HasFiredDestinationEvent = false;
         public UnityAction OnDestinationReached;
 
@@ -50,10 +40,10 @@ namespace HOG.Villager
             if (m_CurrentTarget == null)
                 return;
 
-            if (m_UseDynamicRepathing)
+            if (m_Brain.Settings.UseDynamicRepathing)
             {
                 m_RepathTimer += Time.fixedDeltaTime;
-                if (m_RepathTimer >= m_RepathRate)
+                if (m_RepathTimer >= m_Brain.Settings.RepathRate)
                 {
                     m_RepathTimer = 0f;
                     RecalculatePath();
@@ -65,7 +55,7 @@ namespace HOG.Villager
             direction.y = 0f;
             float distance = direction.magnitude;
 
-            if (distance < m_StopDistance)
+            if (distance < m_Brain.Settings.StopDistance)
             {
                 if (!m_HasFiredDestinationEvent && m_CurrentPath.Count == 0)
                 {
@@ -88,16 +78,16 @@ namespace HOG.Villager
             if (moveDir != Vector3.zero)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-                m_Brain.transform.rotation = Quaternion.Slerp(m_Brain.transform.rotation, targetRotation, Time.fixedDeltaTime * m_RotationSpeed);
+                m_Brain.transform.rotation = Quaternion.Slerp(m_Brain.transform.rotation, targetRotation, Time.fixedDeltaTime * m_Brain.Settings.RotationSpeed);
             }
 
-            if (m_UsePhysicsMovement)
+            if (m_Brain.Settings.UsePhysicsMovement)
             {
-                m_Rigidbody.AddForce(moveDir * m_MoveSpeed, ForceMode.Acceleration);
+                m_Rigidbody.AddForce(moveDir * m_Brain.Settings.MoveSpeed, ForceMode.Acceleration);
             }
             else
             {
-                Vector3 newPos = m_Rigidbody.position + moveDir * m_MoveSpeed * Time.fixedDeltaTime;
+                Vector3 newPos = m_Rigidbody.position + moveDir * m_Brain.Settings.MoveSpeed * Time.fixedDeltaTime;
                 m_Rigidbody.MovePosition(newPos);
             }
         }
@@ -122,7 +112,7 @@ namespace HOG.Villager
                 return;
             }
 
-            //List<Vector3> cleanPath = CleanPathStart(path, startPosRounded);
+            List<Vector3> cleanPath = CleanPathStart(path, startPosRounded);
 
             m_CurrentPath = new Queue<Vector3>(path);
             m_CurrentTarget = null;
@@ -142,12 +132,12 @@ namespace HOG.Villager
 
         public void StartSprint()
         {
-            m_MoveSpeed = 1f;
+            m_Brain.Settings.MoveSpeed = 1f;
         }
 
         public void StopSprint()
         {
-            m_MoveSpeed = 0.5f;
+            m_Brain.Settings.MoveSpeed = 0.5f;
         }
 
         public void PauseMovement()

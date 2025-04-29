@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 710fee74d4edc9a44bb6a29a8b574d4a, type: 3}
+  m_Name: VillagerSettingsAdult
+  m_EditorClassIdentifier: 
+  Type: 2
+  MoveSpeed: 0.5
+  StopDistance: 0.3
+  RotationSpeed: 13
+  UsePhysicsMovement: 0
+  UseDynamicRepathing: 0
+  RepathRate: 1
+  DetectionLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  DetectionRadius: 0.1
+  Tags:
+  - Resource_Wood
+  - Resource_Rock
+  - Building
+  SensorRadius: 30

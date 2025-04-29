@@ -7,6 +7,12 @@ namespace HOG.Resources
     {
         private Dictionary<ResourceType, int> m_Storage = new Dictionary<ResourceType, int>();
 
+        [SerializeField] private int m_LowWoodAmount = 5;
+        [SerializeField] private int m_LowRockAmount = 5;
+
+        public int LowWoodAmount => m_LowWoodAmount;
+        public int LowRockAmount => m_LowRockAmount;
+
         private void Start()
         {
             AddResource(new ResourceCollectionInfo(ResourceType.Wood, 15));

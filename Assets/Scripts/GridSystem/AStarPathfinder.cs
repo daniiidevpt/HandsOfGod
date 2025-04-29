@@ -7,7 +7,7 @@ namespace HOG.Grid
     {
         public static List<Vector3> FindPath(Vector3 startWorld, Vector3 targetWorld, GridManager gridManager, bool includeExactStart = false, bool includeExactEnd = false)
         {
-            Debug.Log("===== PATHFIND REQUEST =====");
+            //Debug.Log("===== PATHFIND REQUEST =====");
 
             GridNode startNode = gridManager.GetNodeFromWorld(startWorld);
             GridNode targetNode = gridManager.GetNodeFromWorld(targetWorld);
@@ -24,8 +24,8 @@ namespace HOG.Grid
                 return null;
             }
 
-            Debug.Log($"Start Node: {startNode.m_GridPos}, Walkable: {startNode.m_Walkable}");
-            Debug.Log($"Target Node: {targetNode.m_GridPos}, Walkable: {targetNode.m_Walkable}");
+            //Debug.Log($"Start Node: {startNode.m_GridPos}, Walkable: {startNode.m_Walkable}");
+            //Debug.Log($"Target Node: {targetNode.m_GridPos}, Walkable: {targetNode.m_Walkable}");
 
             if (!startNode.m_Walkable)
             {

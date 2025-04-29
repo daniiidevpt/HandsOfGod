@@ -58,5 +58,10 @@ namespace HOG.Villager
                 ChangeState(newState);
             }
         }
+
+        public string GetCurrentStateName()
+        {
+            return (m_CurrentState as BaseState)?.StateName ?? "Unknown";
+        }
     }
 }
