@@ -8,11 +8,15 @@ namespace HOG.Villager
         private Coroutine m_SwingRoutine;
         private Coroutine m_CollectRoutine;
 
+        private Wood m_Wood;
+
         public CollectWoodState(VillagerBrain brain, string stateName = null) : base(brain, stateName) { }
 
         public void SetContext(StateContext context)
         {
             m_Context = context;
+
+            m_Wood = context.TargetResource as Wood;
         }
 
         public override void Enter()
@@ -39,7 +43,7 @@ namespace HOG.Villager
         {
             base.Update();
 
-            if (m_Context.TargetResource.IsCollected)
+            if (m_Wood.IsCollected || m_Wood.IsBurning)
             {
                 m_Brain.GetStateMachine().ChangeState(m_Brain.PatrolState);
             }

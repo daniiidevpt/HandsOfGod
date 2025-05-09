@@ -819,11 +819,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 8056847694603066456}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.00000011920929}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.15}
   m_SizeDelta: {x: 10, y: 1}
-  m_Pivot: {x: 0.5, y: 1}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1638557092132072056
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1193,7 +1193,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  m_EvalutationRange: 1
+  m_EvalutationMaxRange: 3
   m_VillagerSwingAnim: {fileID: 7400000, guid: 82a7ea12da126164aa3dc1e8e00fa679, type: 2}
   m_Hammer: {fileID: 3448161499966845694}
   m_Shovel: {fileID: 4802422857028350475}

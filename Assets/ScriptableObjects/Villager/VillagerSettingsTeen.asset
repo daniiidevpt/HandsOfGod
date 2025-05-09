@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 710fee74d4edc9a44bb6a29a8b574d4a, type: 3}
   m_Name: VillagerSettingsTeen
   m_EditorClassIdentifier: 
+  Type: 1
   MoveSpeed: 0.5
   StopDistance: 0.3
   RotationSpeed: 10
@@ -26,4 +27,5 @@ MonoBehaviour:
   - Resource_Wood
   - Resource_Rock
   - Building
+  - Altar
   SensorRadius: 30

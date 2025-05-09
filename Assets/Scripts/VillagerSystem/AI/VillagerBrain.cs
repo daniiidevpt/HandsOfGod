@@ -57,6 +57,7 @@ namespace HOG.Villager
         public BuildingState BuildingState { get; private set; }
         public PanicState PanicState { get; private set; }
         public TalkState TalkState { get; private set; }
+        public WorshipState WorshipState { get; private set; }
         #endregion
 
         private VillagerSensor m_Sensor;
@@ -108,6 +109,7 @@ namespace HOG.Villager
             BuildingState = new BuildingState(this, "BuildingState");
             PanicState = new PanicState(this, "PanicState");
             TalkState = new TalkState(this, "TalkState");
+            WorshipState = new WorshipState(this, "WorshipState");
 
             m_StateMachine = new StateMachine();
             m_StateMachine.ChangeState(PatrolState);
@@ -187,6 +189,9 @@ namespace HOG.Villager
 
             RigidbodyConstraints unfreeze = RigidbodyConstraints.None;
             m_Rigidbody.constraints = unfreeze;
+
+            StopVillagerTalk();
+            StopVillagerWorkship();
         }
 
         public void OnReleased(HVRGrabberBase grabberBase, HVRGrabbable grabbable)
@@ -280,6 +285,10 @@ namespace HOG.Villager
         public void PlayVillagerTalk() => m_Animator.SetBool("IsTalking", true);
         public void StopVillagerTalk() => m_Animator.SetBool("IsTalking", false);
 
+        public void PlayVillagerWorkship() => m_Animator.SetBool("IsWorshiping", true);
+
+        public void StopVillagerWorkship() => m_Animator.SetBool("IsWorshiping", false);
+
         #endregion
 
         #region Villager UI
@@ -330,6 +339,14 @@ namespace HOG.Villager
                 ctx.TargetBuilding = builder;
                 BuildingState.SetContext(ctx);
                 m_StateMachine.ChangeState(BuildingState);
+                return;
+            }
+
+            if (target.TryGetComponent(out WorshipAltar altar))
+            {
+                ctx.Target = altar.GetRandomPlace();
+                WorshipState.SetContext(ctx);
+                m_StateMachine.ChangeState(WorshipState);
                 return;
             }
         }

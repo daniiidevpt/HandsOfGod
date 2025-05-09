@@ -9,6 +9,7 @@ TagManager:
   - Resource_Wood
   - Villager
   - Building
+  - Altar
   layers:
   - Default
   - TransparentFX

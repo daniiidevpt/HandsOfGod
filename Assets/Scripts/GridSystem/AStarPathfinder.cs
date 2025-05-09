@@ -29,8 +29,32 @@ namespace HOG.Grid
 
             if (!startNode.m_Walkable)
             {
-                Debug.LogWarning("Start node is NOT walkable.");
-                return null;
+                Debug.LogWarning("Start node is NOT walkable. Searching for closest walkable neighbor...");
+
+                GridNode[] neighbors = gridManager.GetNeighbors(startNode);
+                GridNode fallback = null;
+                float minDist = float.MaxValue;
+
+                foreach (var node in neighbors)
+                {
+                    if (!node.m_Walkable) continue;
+
+                    float dist = Vector3.Distance(startWorld, node.m_WorldPos);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        fallback = node;
+                    }
+                }
+
+                if (fallback == null)
+                {
+                    Debug.LogError("No walkable neighbor found near start node.");
+                    return null;
+                }
+
+                startNode = fallback;
+                Debug.Log($"Fallback start node used at {startNode.m_GridPos}");
             }
 
             if (!targetNode.m_Walkable)

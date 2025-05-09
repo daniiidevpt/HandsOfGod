@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace HOG.Building
 {
-    public class HouseBuilder : MonoBehaviour
+    public class HouseBuilder : MonoBehaviour, IBurnable
     {
         [Header("Building Settings")]
         [SerializeField] private BuildingStage m_CurrentStage = BuildingStage.Stage1;
@@ -17,10 +17,18 @@ namespace HOG.Building
         private int m_CurrentStageIndex = 0;
         private bool m_IsFinished = false;
         private bool m_IsBuildable = false;
+        private Coroutine m_BuildRoutine;
+
+        [Header("Fire VFX")]
+        [SerializeField] private GameObject m_FireVFX;
+        [SerializeField] private int m_BurnTime = 3;
+        [SerializeField] private GameObject m_DestroyedHouse;
+        private bool m_IsBurning;
 
         public Transform BuildingPosition => m_BuildingPosition;
         public bool IsFinsihed => m_IsFinished;
         public bool IsBuildable => m_IsBuildable;
+        public bool IsBurning => m_IsBurning;
 
         [Header("Building Cost")]
         [SerializeField] private int m_WoodAmount = 5;
@@ -44,8 +52,6 @@ namespace HOG.Building
 
             m_WoodCostText.text = $"Wood: {m_WoodAmount}";
             m_RockCostText.text = $"Wood: {m_RockAmount}";
-
-            //Invoke("StartBuildingHouse", 5f);
         }
 
         private void OnEnable()
@@ -80,7 +86,7 @@ namespace HOG.Building
                 m_Canvas.SetActive(false);
                 m_IsBuildable = true;
 
-                StartCoroutine(BuildHouse());
+                m_BuildRoutine = StartCoroutine(BuildHouse());
             }
             else
             {
@@ -106,6 +112,29 @@ namespace HOG.Building
                     m_StageObjects[m_CurrentStageIndex].SetActive(true);
                 }
             }
+        }
+
+        public void Ignite()
+        {
+            if (m_IsBurning) return;
+
+            if (m_BuildRoutine != null)
+            {
+                StopCoroutine(m_BuildRoutine);
+            }
+
+            m_IsBurning = true;
+            GameObject fire = Instantiate(m_FireVFX, transform.position + Vector3.up, Quaternion.identity);
+            Destroy(fire, m_BurnTime);
+
+            StartCoroutine(BurnUp());
+        }
+
+        private IEnumerator BurnUp()
+        {
+            yield return new WaitForSeconds(m_BurnTime);
+            m_StageObjects[m_CurrentStageIndex].SetActive(false);
+            m_DestroyedHouse.SetActive(true);
         }
     }
 }

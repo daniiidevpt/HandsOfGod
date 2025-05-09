@@ -70,8 +70,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ResourceType: 2
   m_ResourceAmount: 1
-  m_HitsToDestroy: 3
+  m_TimeToCollect: 3
+  m_TreeVisuals: {fileID: 8624710878570372915}
   m_CollectVFX: {fileID: 191186, guid: 2c9d76efeead28b44b00818530c5795c, type: 3}
+  m_FireVFX: {fileID: 100000, guid: 756d99540142b5e4a8d174e18a6310d9, type: 3}
+  m_BurnTime: 3
 --- !u!114 &-8995996995996943451
 MonoBehaviour:
   m_ObjectHideFlags: 0
