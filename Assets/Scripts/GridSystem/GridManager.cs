@@ -83,7 +83,9 @@ namespace HOG.Grid
         public void ClearGrid()
         {
             m_Grid = null;
+#if UNITY_EDITOR
             m_IsEditorGridGenerated = false;
+#endif
         }
 
         public GridNode GetNodeFromWorld(Vector3 worldPosition)
